@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="purple_primary">#7B1FA2</color>      <!-- deep purple -->
+    <color name="purple_light">#F5E5FF</color>        <!-- very light purple card bg -->
+    <color name="purple_accent">#B399FF</color>       <!-- button/fab -->
+    <color name="pink_accent">#D81B60</color>         <!-- secondary accent (optional) -->
+    <color name="text_primary">#4A148C</color>        <!-- heading text -->
+    <color name="text_secondary">#7A6BA0</color>      <!-- subtitle text -->
+    <color name="danger_red">#B00020</color>
+    <color name="lavender_pink_switch_thumb">#B388FF</color>
+    <color name="lavender_pink_switch_track">#F8BBD0</color>
 </resources>
