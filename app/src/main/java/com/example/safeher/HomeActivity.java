@@ -1,20 +1,20 @@
 package com.example.safeher;
 
 import android.Manifest;
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -23,20 +23,21 @@ import com.google.android.gms.location.LocationServices;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
 
     private Button btnNotOkay, btnSaveEntry;
-    private TextView btnManageSupport;
+    private TextView btnManageSupport, tvDateTime;
     private EditText etJournal;
     private FusedLocationProviderClient fusedLocationClient;
 
-    private static final int PERMISSION_REQUEST_CODE = 1;
-    private static final String PREFS_NAME = "SafeHerPrefs";
-    private static final String CONTACTS_KEY = "SupportContacts";
+    private ContactDatabaseHelper dbHelper;
 
+    private static final int PERMISSION_REQUEST_CODE = 1;
+
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,9 +48,23 @@ public class HomeActivity extends AppCompatActivity {
         btnSaveEntry = findViewById(R.id.btnSaveEntry);
         btnManageSupport = findViewById(R.id.btnManageSupport);
         etJournal = findViewById(R.id.etJournal);
+        tvDateTime = findViewById(R.id.tvDateTime);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Handle "I’m Not Okay" button
+        dbHelper = new ContactDatabaseHelper(this);
+
+        // New: profile and settings buttons
+        ImageView btnProfile = findViewById(R.id.btnProfile);
+        ImageView btnSettings = findViewById(R.id.btnSettings);
+
+        // Set current date and time
+        updateDateTime();
+
+        // Handle top-right buttons
+        btnProfile.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, ProfileActivity.class)));
+        btnSettings.setOnClickListener(v -> startActivity(new Intent(HomeActivity.this, SettingsActivity.class)));
+
+        // Handle "I'm Not Okay" button
         btnNotOkay.setOnClickListener(v -> sendAlertMessage());
 
         // Handle "Save Entry" (Hybrid Safety)
@@ -75,40 +90,64 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh top contacts when returning from SupportCircleActivity
+        // Refresh date/time and top contacts when returning from SupportCircleActivity
+        updateDateTime();
         displayTopContacts();
     }
 
-    // Method to dynamically display top 3 contacts
+    // Method to dynamically display contacts
     private void displayTopContacts() {
         LinearLayout contactContainer = findViewById(R.id.layoutSupportList);
         contactContainer.removeAllViews();
 
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        Set<String> contacts = prefs.getStringSet(CONTACTS_KEY, null);
+        List<Contact> contacts = dbHelper.getAllContacts();
 
         if (contacts != null && !contacts.isEmpty()) {
-            int count = 0;
-            for (String contact : contacts) {
-                if (count >= 3) break;
+            int shown = 0;
+            for (Contact contact : contacts) {
+                if (shown >= 3) break;
 
                 TextView tv = new TextView(this);
-                tv.setText(contact);
-                tv.setTextSize(16);
-                tv.setPadding(12, 8, 12, 8);
+                String displayText = contact.getName() + " - " + contact.getRelationship() + " • " + contact.getPhoneNumber();
+                tv.setText(displayText);
+                tv.setTextColor(0xFF212121); // Black color
+                tv.setTextSize(14);
+                tv.setPadding(8, 8, 8, 8);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                // convert dp margin to px
+                final float scale = getResources().getDisplayMetrics().density;
+                int bottomMarginPx = (int) (8 * scale + 0.5f);
+                params.setMargins(0, 0, 0, bottomMarginPx);
+                tv.setLayoutParams(params);
 
                 contactContainer.addView(tv);
-                count++;
+                shown++;
+            }
+
+            if (shown == 0) {
+                TextView empty = new TextView(this);
+                empty.setText("No contacts added yet.");
+                empty.setTextColor(0xFF757575);
+                empty.setTextSize(14);
+                empty.setPadding(8, 6, 8, 6);
+                contactContainer.addView(empty);
             }
         } else {
             TextView empty = new TextView(this);
             empty.setText("No contacts added yet.");
-            empty.setTextSize(16);
-            empty.setPadding(12, 8, 12, 8);
+            empty.setTextColor(0xFF757575); // Gray color
+            empty.setTextSize(14);
+            empty.setPadding(8, 6, 8, 6);
             contactContainer.addView(empty);
         }
     }
 
+    @SuppressLint("MissingPermission")
+    @RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
     private void sendAlertMessage() {
         if (!checkPermissions()) return;
 
@@ -137,8 +176,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void sendSMSToSupport(String message) {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        Set<String> contacts = prefs.getStringSet(CONTACTS_KEY, null);
+        List<Contact> contacts = dbHelper.getAllContacts();
 
         if (contacts == null || contacts.isEmpty()) {
             Toast.makeText(this, "No contacts in Support Circle.", Toast.LENGTH_SHORT).show();
@@ -146,15 +184,30 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         SmsManager smsManager = SmsManager.getDefault();
-        for (String contact : contacts) {
-            try {
-                smsManager.sendTextMessage(contact, null, message, null, null);
-            } catch (Exception e) {
-                Toast.makeText(this, "Failed to send SMS to " + contact, Toast.LENGTH_SHORT).show();
+        int sentCount = 0;
+
+        for (Contact contact : contacts) {
+            if (contact != null) {
+                try {
+                    smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
+                    sentCount++;
+                } catch (Exception e) {
+                    Toast.makeText(this, "Failed to send SMS to " + contact.getName(), Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
-        Toast.makeText(this, "Message sent to your Support Circle.", Toast.LENGTH_LONG).show();
+        if (sentCount > 0) {
+            Toast.makeText(this, "Message sent to " + sentCount + " contact(s).", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Failed to send messages.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateDateTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMM d • h:mm a", Locale.getDefault());
+        String currentDateTime = dateFormat.format(new Date());
+        tvDateTime.setText(currentDateTime);
     }
 
     private boolean checkPermissions() {

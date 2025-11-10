@@ -1,5 +1,6 @@
 package com.example.safeher;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -16,10 +18,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     private final List<Contact> contactList;
     private final OnContactDeleteListener deleteListener;
 
-    // Alternate colors for initials background
+    // Alternate colors for initials circle background
     private final int[] avatarColors = {
-            0xFFE1BEE7, // Lavender
-            0xFFF8BBD0  // Pink
+            0xFFB39DDB, // Soft Purple
+            0xFFF48FB1, // Soft Pink
+            0xFF81D4FA, // Light Blue
+            0xFFA5D6A7, // Mint Green
+            0xFFFFE082  // Soft Yellow
     };
 
     // Constructor
@@ -45,26 +50,25 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
         Contact contact = contactList.get(position);
 
-        // Bind data
+        // Bind text fields
         holder.tvContactName.setText(contact.getName());
         holder.tvRelationship.setText(contact.getRelationship());
         holder.tvPhoneNumber.setText(contact.getPhoneNumber());
         holder.tvInitials.setText(getInitials(contact.getName()));
 
-        // Alternate avatar background color safely
-        int color = avatarColors[position % avatarColors.length];
-        if (holder.tvInitials.getBackground() != null) {
-            holder.tvInitials.getBackground().setTint(color);
+        // Tint circular background dynamically
+        Drawable background = holder.tvInitials.getBackground();
+        if (background != null) {
+            Drawable wrapped = DrawableCompat.wrap(background.mutate());
+            int color = avatarColors[position % avatarColors.length];
+            DrawableCompat.setTint(wrapped, color);
+            holder.tvInitials.setBackground(wrapped);
         }
 
-        // Show or hide "Primary" badge
-        if (contact.isPrimary()) {
-            holder.tvPrimaryBadge.setVisibility(View.VISIBLE);
-        } else {
-            holder.tvPrimaryBadge.setVisibility(View.GONE);
-        }
+        // Handle primary badge visibility
+        holder.tvPrimaryBadge.setVisibility(contact.isPrimary() ? View.VISIBLE : View.GONE);
 
-        // Delete button click
+        // Handle delete click
         holder.btnDelete.setOnClickListener(v -> {
             if (deleteListener != null) {
                 deleteListener.onDelete(contact);
@@ -93,16 +97,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         }
     }
 
-    // Helper to extract initials from name
+    // Helper: get initials from name
     private String getInitials(String name) {
-        if (name == null || name.isEmpty()) return "?";
+        if (name == null || name.trim().isEmpty()) return "?";
         String[] parts = name.trim().split("\\s+");
         StringBuilder initials = new StringBuilder();
         for (String part : parts) {
-            if (!part.isEmpty()) initials.append(part.charAt(0));
+            if (!part.isEmpty()) initials.append(Character.toUpperCase(part.charAt(0)));
         }
-        return initials.length() > 2
-                ? initials.substring(0, 2).toUpperCase()
-                : initials.toString().toUpperCase();
+        return initials.length() > 2 ? initials.substring(0, 2) : initials.toString();
     }
 }

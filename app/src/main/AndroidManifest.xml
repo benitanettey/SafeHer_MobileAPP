@@ -28,10 +28,14 @@
             </intent-filter>
         </activity>
 
-        <!-- ✅ Support circle activity -->
+        <!--  Support circle activity -->
         <activity
             android:name=".SupportCircleActivity"
             android:exported="false" />
+
+        <!-- Profile and Settings activities -->
+        <activity android:name=".ProfileActivity" android:exported="false" />
+        <activity android:name=".SettingsActivity" android:exported="false" />
 
     </application>
 
