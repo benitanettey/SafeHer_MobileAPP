@@ -1,0 +1,71 @@
+# Gradle files
+.gradle/
+build/
+*/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# IntelliJ / Android Studio files
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Log files
+*.log
+
+# Generated files
+captures/
+outputs/
+navigation.json
+*.apk
+*.ap_
+
+# Gradle Wrapper files
+!gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+
+# Android specific
+.DS_Store
+.externalNativeBuild/
+.cxx/
+*.class
+*.dex
+
+# Keystore files (security)
+*.jks
+*.keystore
+
+# NDK
+obj/
+
+# Misc
+*.orig
+*.rej
+*.swp
+*.swo
+*.tmp
+
+# Ignore backup and crashlytics data
+app/src/main/res/xml/backup.xml
+crashlytics-build.properties
+
+# Ignore generated signing configs
+signing.properties
+
+# Mac & Windows specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Ignore cache
+.cache/
+*.kotlin_module
+
+# Ignore generated local data
+.env
+*.local
+

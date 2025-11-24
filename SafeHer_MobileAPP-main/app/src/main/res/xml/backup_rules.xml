@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   SafeHer Privacy Configuration (Android 11 and below)
+   Disables auto backup to protect user privacy.
+   Note: This file is for devices older than API 31 (Android 12)
+-->
+<full-backup-content>
+    <!-- Exclude all SharedPreferences -->
+    <exclude domain="sharedpref" path="."/>
+
+    <!-- Exclude all databases -->
+    <exclude domain="database" path="."/>
+
+    <!-- Exclude all files -->
+    <exclude domain="file" path="."/>
+
+    <!-- Exclude external storage -->
+    <exclude domain="external" path="."/>
+</full-backup-content>
