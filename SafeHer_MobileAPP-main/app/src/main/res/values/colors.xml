@@ -9,6 +9,16 @@
     <color name="text_primary">#4A148C</color>        <!-- heading text -->
     <color name="text_secondary">#7A6BA0</color>      <!-- subtitle text -->
     <color name="danger_red">#B00020</color>
+    <color name="purple_light_bg">#F8F0FC</color> <!-- Background for Status/Footer cards -->
+    <color name="avatar_gradient_start">#E1BEE7</color> <!-- Light purple for avatar -->
+    <color name="avatar_gradient_end">#F8BBD0</color>
+    <color name="divider_grey">#E0E0E0</color>
+    <color name="status_dot_inactive">#BDBDBD</color>
     <color name="lavender_pink_switch_thumb">#B388FF</color>
     <color name="lavender_pink_switch_track">#F8BBD0</color>
+
+    <array name="avatar_colors">
+    <item name= "Pink" type="color">#c2185b</item>
+    <item name= "Purple" type="color">#7b1fa2</item>
+    </array>
 </resources>

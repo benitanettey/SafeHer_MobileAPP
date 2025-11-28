@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="false"
@@ -32,6 +34,66 @@
         <activity
             android:name=".SupportCircleActivity"
             android:exported="false" />
+
+        <!-- ✅ Profile activity -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <!--  Settings activity -->
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <!--  About activity -->
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false" />
+
+        <!--Privacy Policy activity -->
+        <activity
+            android:name=".PrivacyPolicyActivity"
+            android:exported="false" />
+
+        <!-- Help and Support activity -->
+        <activity
+            android:name=".HelpAndSupportActivity"
+            android:exported="false" />
+
+        <!-- Alert History activity -->
+        <activity
+            android:name=".AlertHistoryActivity"
+            android:exported="false" />
+
+        <!-- App Lock activity -->
+        <activity
+            android:name=".AppLockActivity"
+            android:exported="false" />
+
+        <!-- App Lock Setup activity -->
+        <activity
+            android:name=".AppLockSetupActivity"
+            android:exported="false" />
+
+        <receiver
+            android:name=".ReminderBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- FileProvider for camera photo -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.safeher.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 
