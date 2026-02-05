@@ -44,8 +44,8 @@ public class SupportCircleActivity extends AppCompatActivity {
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         contactList = loadContacts();
 
-        // Initialize adapter with delete listener
-        adapter = new ContactAdapter(contactList, contact -> {
+        // CORRECTED: Initialize adapter with the correct constructor (context, list, listener)
+        adapter = new ContactAdapter(this, contactList, contact -> {
             // Handle contact deletion
             int position = contactList.indexOf(contact);
             if (position != -1) {
@@ -103,7 +103,7 @@ public class SupportCircleActivity extends AppCompatActivity {
         Button btnSaveContact = bottomSheet.findViewById(R.id.btnSaveContact);
 
         if (btnSaveContact == null || etName == null || etPhone == null ||
-            etRelationship == null || switchPrimary == null) {
+                etRelationship == null || switchPrimary == null) {
             Toast.makeText(this, "Error loading contact form.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -171,7 +171,7 @@ public class SupportCircleActivity extends AppCompatActivity {
             // Check if phone already exists (using normalized number)
             for (Contact contact : contactList) {
                 String existingNormalized = Contact.normalizePhoneNumber(contact.getPhoneNumber());
-                if (existingNormalized.equals(normalizedPhone)) {
+                if (existingNormalized != null && existingNormalized.equals(normalizedPhone)) {
                     Toast.makeText(this, "Contact with this number already exists: " + contact.getName(),
                             Toast.LENGTH_LONG).show();
                     return;
@@ -189,7 +189,7 @@ public class SupportCircleActivity extends AppCompatActivity {
             Contact newContact = new Contact(name, normalizedPhone, relationship, isPrimary);
             contactList.add(newContact);
             saveContacts();
-            adapter.notifyItemInserted(contactList.size() - 1);
+            adapter.notifyDataSetChanged(); // Use notifyDataSetChanged after modifying primary status
 
             Toast.makeText(this, "Contact added successfully!", Toast.LENGTH_SHORT).show();
             bottomSheet.dismiss();
