@@ -108,7 +108,7 @@ Even without internet or data, SMS alerts and safety features continue to functi
 **Size:** ~XX MB
 **Minimum Android:** Android 6.0 (API 23)
 
-👉 *(Insert your APK download link here)*
+APK link coming soon
 
 ---
 
@@ -127,10 +127,4 @@ It is not just an app—it is a **preventive safety tool designed to save lives 
 * 🔊 Voice-activated SOS trigger
 * 🌍 Expansion beyond Kenya
 
----
 
-If you want, I can take this further and:
-
-* Make it **ATS-optimized for recruiters**
-* Add **GitHub badges + visuals**
-* Or turn it into a **portfolio case study that actually lands interviews**
